@@ -31,13 +31,13 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  const genre = await Genre.findByIdAndRemove(req.params.id);
+  const genre = await Genre.findByIdAndRemove(req.params.id).catch();
   if (!genre) return res.status(404).send('The genre with the given ID was not found.');
   res.send(genre);
 });
 
 router.get('/:id', async (req, res) => {
-  const customer = await Customer.findById(req.params.id);
+  const customer = await Customer.findById(req.params.id).catch();
   if (!genre) return res.status(404).send('The genre with the given ID was not found.');
   res.send(genre);
 });

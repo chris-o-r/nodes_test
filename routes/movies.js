@@ -15,8 +15,13 @@ router.get('/', async (req, res) => {
 }); 
 
 router.get('/:id', async (req, res) => {
-    const movie = await Movie.findById(req.params.id); 
-    if (movie == null) return res.send(404).send(`The movie with the ID: ${req.param.id} was not found.`);  
+    let movie = null; 
+    try{    
+        movie = await Movie.findById(req.params.id); 
+    }catch(error){
+        
+    }
+    if (movie == null) return res.status(404).send(`The movie with the ID: ${req.params.id} was not found.`);  
     res.send(movie); 
 }); 
 
@@ -47,10 +52,10 @@ router.put('/:id', async(req, res) => {
     const { error } = validate(req.body);
     if (error != null) return  res.status(400).send(error.details[0].message);
 
-    const genre = await Genre.findById(req.body.genreId); 
-    if (genre == null)  return res.status(404).send(`The movie with the ID: ${req.body.genreId} was not found`);
+    const genre = await Genre.findById(req.body.genreId).catch(err => console.error(err)); 
+    if (genre == null)  return res.status(404).send(`The genre with the ID: ${req.body.genreId} was not found`);
 
-    let movie = await Movie.findByIdAndUpdate({
+    let movie = await Movie.findByIdAndUpdate(req.params.id, {
         title: req.body.title,
         genre: {
           _id: genre._id,
@@ -58,7 +63,7 @@ router.put('/:id', async(req, res) => {
         },
         numberInStock: req.body.numberInStock,
         dailyRentalRate: req.body.dailyRentalRate
-    });
+    }).catch(err => console.error(err));
 
     if (movie == null) return res.status(404).send(`The movie with the ID: ${req.params.id} was not found`); 
     movie = await movie.save();
